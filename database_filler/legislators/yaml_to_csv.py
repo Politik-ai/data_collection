@@ -15,8 +15,8 @@ politician_term = Table(
    Column('polid', Integer), 
    Column('firstname', String), 
    Column('lastname', String), 
-   Column('start', Date),
-   Column('end', Date),
+   Column('start_d', Date),
+   Column('end_d', Date),
    Column('party_affiliation', String),
    Column('state', String),
    Column('legislative_body', String),
@@ -65,7 +65,7 @@ with open(congress_dir + current_yaml) as file:
                 district = term['district']
 
             ins = politician_term.insert().values(polid = bioid, firstname = firstname, lastname = lastname, \
-            party_affiliation= party, state = state, district = district, start = start_date, end = end_date, \
+            party_affiliation= party, state = state, district = district, start_d = start_date, end_d = end_date, \
             legislative_body = body, gender = gender)
             result = conn.execute(ins)
             
@@ -78,7 +78,5 @@ fh = open('pol_db.csv', 'wb')
 outcsv = csv.writer(fh)
 outcsv.writerow(result.keys())
 for row in result:
-    print('test')
-    print(row)
-outcsv.writerows(result)
+    outcsv.writerow([unicode(s).encode("utf-8") for s in row])
 fh.close
