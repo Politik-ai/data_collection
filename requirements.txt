@@ -1,2 +1,4 @@
 sqlalchemy
 pyyaml
+pandas
+mysqlclient
