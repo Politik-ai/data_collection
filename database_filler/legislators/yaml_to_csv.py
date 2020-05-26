@@ -78,12 +78,9 @@ for y in [current_yaml, historical_yaml]:
         info = yaml.full_load(file)
         for item in info:
             gender = item['bio']['gender']
-            print('----')
             dob = item['bio'].get('birthday','0001-01-01')
-            print(dob)
             dob = date(*[int(i) for i in dob.split('-')])
             if dob.year < 1900:
-                print('stop here!')
                 skips += 1
                 continue
             bio_id = item['id']['bioguide']
@@ -106,7 +103,6 @@ for y in [current_yaml, historical_yaml]:
                 party_affiliation= party, state = state, district = district, start_d = start_date, end_d = end_date, \
                 legislative_body = body, gender = gender)
                 result = session.execute(ins)
-                print('added term!-------------------------------')
                 
 
 print(skips)
