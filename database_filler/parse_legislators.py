@@ -9,19 +9,7 @@ from sqlalchemy.orm import sessionmaker
 import csv
 from sqlalchemy.ext.declarative import declarative_base
 
-"""
-Base = declarative_base()
-class politician(Base):
-    __tablename__ = 'politician'
-    id = Column(Integer, primary_key = True)
-    bioid = Column(String)
-    date_of_birth = Column(Date)
-
-    def __repr__(self):
-        return "<politician(name="
-"""
-
-engine = create_engine('sqlite:///politician_term.db', echo=True)
+engine = create_engine('sqlite:///../political_db.db', echo=True)
 meta = MetaData()
 
 politician_term = Table(
@@ -63,7 +51,7 @@ session = sess()
 
 current_yaml = 'congress-legislators/legislators-current.yaml'
 historical_yaml = 'congress-legislators/legislators-historical.yaml'
-congress_dir = '../../../congress/'
+congress_dir = '../../congress/'
 dirname = os.path.dirname(__file__)
 filename = os.path.join(dirname, congress_dir + current_yaml)
 skips = 0
@@ -107,19 +95,19 @@ result = session.execute(politician_term.select())
 # result = conn.execute(s)
 if os.path.exists("pol_term.csv"):
     os.remove("pol_term.csv")
-fh = open('pol_term.csv', 'wb')
+fh = open('pol_term.csv', 'w')
 outcsv = csv.writer(fh)
-outcsv.writerow(result.keys())
+outcsv.writerow([s for s in result.keys()])
 for row in result:
-    outcsv.writerow([unicode(s).encode("utf-8") for s in row])
+    outcsv.writerow([s for s in row])
 fh.close
 
 result = session.execute(politician.select())
 if os.path.exists("pol.csv"):
     os.remove("pol.csv")
-fh = open('pol.csv', 'wb')
+fh = open('pol.csv', 'w')
 outcsv = csv.writer(fh)
-outcsv.writerow(result.keys())
+outcsv.writerows(result.keys())
 for row in result:
-    outcsv.writerow([unicode(s).encode("utf-8") for s in row])
+    outcsv.writerow(row)
 fh.close
