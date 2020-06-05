@@ -1,3 +1,13 @@
+import os
+import middle.json
+import yaml
+import os
+from datetime import date
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Boolean, Date, sql
+from sqlalchemy.orm import sessionmaker
+import csv
+from sqlalchemy.ext.declarative import declarative_base
+
 """
 Given 2D array--
 Each row:
@@ -13,3 +23,7 @@ data.json  (not bill-state dependent) (get from dir path above)
 parse data.json
 link data and insert to database
 """
+
+bills = Table(
+    'bills', meta
+)
