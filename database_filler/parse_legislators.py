@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # AIM: to get all relevant information on all legislators into database
 
 # parse through yamls

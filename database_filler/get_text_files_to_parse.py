@@ -22,15 +22,17 @@ def get_bill_state_paths():
 
             for bill_num in bill_nums:
                 cur_path_3 = cur_path_2 + '/' + bill_num
-                bill_states = [f.name for f in os.scandir(cur_path_3 + '/text-versions') if f.is_dir()]
+                if os.path.isdir(cur_path_3 + '/text-versions'):
+                    bill_states = [f.name for f in os.scandir(cur_path_3 + '/text-versions') if f.is_dir()]
 
-                for bill_state in bill_states:
-                    cur_path_4 = cur_path_3 + '/text-versions/' + bill_state
-                    cur_path_4 = cur_path_4[len(congress_data_dir):]
-                    bill_num_only = ''.join(i for i in bill_num if i.isdigit())
-                    bill_info = [congress, bill_type, bill_num_only, bill_state, cur_path_4]
-                    total_files.append(bill_info)
-                    i += 1
-                    #print(bill_info)
+                    for bill_state in bill_states:
+                        cur_path_4 = cur_path_3 + '/text-versions/' + bill_state
+                        cur_path_4 = cur_path_4[len(congress_data_dir):]
+                        bill_num_only = ''.join(i for i in bill_num if i.isdigit())
+                        bill_info = [congress, bill_type, bill_num_only, bill_state, cur_path_4]
+                        total_files.append(bill_info)
+                        i += 1
+                        #print(bill_info)
+    print('DONE!')
     return total_files
 
