@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 sys.path.insert(1, '../')
-from get_data_files_to_parse import get_all_data_paths
+from get_all_data_files import all_high_level_data_files
 import json
 import os, csv
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
@@ -30,12 +30,12 @@ def main():
     conn.execute(bill_ref.delete())
     conn.execute(bill_ref.delete())
 
-    files = get_all_data_paths()
+    files = all_high_level_data_files()
     for f in files:
-        path = relative_congress_loc + f
-        print(f)
+        path = relative_congress_loc + f + '/data.json'
+        #print(f)
         path = os.path.abspath(path)
-        print(path)
+        #print(path)
         with open(path) as x:
             data = json.load(x)
             

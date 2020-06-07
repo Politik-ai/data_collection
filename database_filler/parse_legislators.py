@@ -6,10 +6,9 @@
 import yaml
 import os
 from datetime import date
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Boolean, Date, sql
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Date
 from sqlalchemy.orm import sessionmaker
 import csv
-from sqlalchemy.ext.declarative import declarative_base
 
 engine = create_engine('sqlite:///../political_db.db', echo=True)
 meta = MetaData()

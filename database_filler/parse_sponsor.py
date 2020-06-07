@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 sys.path.insert(1, '../')
 from get_data_files_to_parse import get_all_data_paths
@@ -10,7 +12,7 @@ def insert_sponsors():
     files = get_all_data_paths()
 
     for f in files:
-        path = relative_congress_loc + f
+        path = relative_congress_loc + f + '/data.json'
         print(f)
         path = os.path.abspath(path)
         print(path)
