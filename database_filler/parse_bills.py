@@ -54,7 +54,7 @@ def insert_bills():
 
 if __name__ == "__main__":
 
-    engine = create_engine('sqlite:///../political_db.db', echo=True)
+    engine = create_engine('sqlite:///../political_db.db')
     session = scoped_session(sessionmaker(bind=engine))
     relative_congress_loc = "../../congress/data/"
 

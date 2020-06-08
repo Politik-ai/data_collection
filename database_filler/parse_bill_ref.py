@@ -10,10 +10,9 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 def main():
 
-    engine = create_engine('sqlite:///../political_db.db', echo=True)
+    engine = create_engine('sqlite:///../political_db.db')
     db = scoped_session(sessionmaker(bind=engine))
     relative_congress_loc = "../../congress/data/"
-    engine = create_engine('sqlite:///../political_db.db', echo=True)
     meta = MetaData()
 
     bill_ref = Table(

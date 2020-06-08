@@ -35,7 +35,6 @@ def get_bill_state_paths():
                         total_files.append(bill_info)
                         i += 1
                         #print(bill_info)
-    print('DONE!')
     return total_files
 
 get_bill_state_paths()

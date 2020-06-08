@@ -10,7 +10,7 @@ from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, 
 from sqlalchemy.orm import sessionmaker
 import csv
 
-engine = create_engine('sqlite:///../political_db.db', echo=True)
+engine = create_engine('sqlite:///../political_db.db')
 meta = MetaData()
 
 politician_term = Table(
