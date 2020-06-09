@@ -1,29 +1,84 @@
-import os
-import middle.json
-import yaml
-import os
+#!/usr/bin/env python3
+
 from datetime import date
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Boolean, Date, sql
-from sqlalchemy.orm import sessionmaker
-import csv
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Boolean, Date, sql, func
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import scoped_session, sessionmaker
+import sys, os, csv, json
+sys.path.insert(1, '../')
+from get_bill_states_to_parse import get_bill_state_paths
+from get_data_file import get_data_path
 
-"""
-Given 2D array--
-Each row:
-Note: locations are relative to: 
+def insert_bills():
 
-1. dir path to eg. "hr2/"
-data.json  (not bill-state dependent) (get from dir path above)
-2. congress num
-3. bill type (eg. hr or s)
-4. bill code (eh, ih)
+    files = get_bill_state_paths()
+    cur_bill_id = -1
+    for f in files:
 
+        data_file = get_data_path(f)
+        bill_data_path = relative_congress_loc + data_file + '/data.json'
 
-parse data.json
-link data and insert to database
-"""
+        if f[0] != cur_bill_id:
+            session.execute("INSERT INTO bills(bill_code) VALUES (:bill_code)", {"bill_code": f[2] + f[3]+ '-' + f[1]})
+            cur_bill_id = session.execute(func.count(bills.c.id)).first().items()[0][1]
 
-bills = Table(
-    'bills', meta
-)
+        bill_state_dict = {}
+
+        #get titles from json, short and official
+        #NOTE: should we get all short titles and of portions?
+        with open(bill_data_path) as x:
+            data = json.load(x)
+            bill_state_dict["short_title"] = data['short_title']
+            bill_state_dict["official_title"] = data['official_title']
+
+        bill_state_dict["congress"] = f[1]
+        bill_state_dict["bill_type"] = f[2]
+        bill_state_dict["status_code"] = f[4]
+        bill_state_dict['id'] = f[2] + f[3] + f[4] + '-' + f[1]
+        bill_state_dict["bill_id"] = cur_bill_id
+        
+
+        bill_state_dict["text_location"] = os.path.abspath(f[5] + "/document.txt")
+
+        with open(relative_congress_loc + f[5] + '/data.json') as x:
+            data = json.load(x)
+            dob = data["issued_on"]
+            bill_state_dict["intro_date"] = date(*[int(i) for i in dob.split('-')])
+
+        session.execute(
+            "INSERT INTO bill_states(id, bill_id, bill_type, status_code, text_location, short_title, official_title, intro_date, congress) \
+            VALUES (:id, :bill_id, :bill_type, :status_code, :text_location, :short_title, :official_title, :intro_date, :congress)",
+            bill_state_dict)
+
+    session.commit()
+
+if __name__ == "__main__":
+
+    engine = create_engine('sqlite:///../political_db.db')
+    session = scoped_session(sessionmaker(bind=engine))
+    relative_congress_loc = "../../congress/data/"
+
+    meta = MetaData()
+    bills = Table(
+        'bills', meta,
+        Column('id', Integer, primary_key=True),
+        Column('bill_code', String),
+        sqlite_autoincrement=True
+    )
+
+    bill_states = Table(
+        'bill_states', meta,
+        Column('id', String, primary_key=True),
+        Column('bill_id', Integer),
+        Column('bill_type', String),
+        Column('status_code', String),
+        Column('text_location', String),
+        Column('short_title', String),
+        Column('official_title', String),
+        Column('intro_date', Date),
+        Column('congress', Integer),
+        sqlite_autoincrement=True
+    )
+
+    meta.create_all(engine)
+    insert_bills()
