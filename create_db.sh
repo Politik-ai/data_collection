@@ -1,5 +1,10 @@
-rm political_db.db
-echo "Removed old db"
+
+DB=political_db.db
+if test -f "$DB"; then
+    rm $DB
+    echo "Removed old db"
+fi
+
 cd database_filler
 ./parse_legislators.py
 echo "Added legislators"
