@@ -105,9 +105,9 @@ for y in [current_yaml, historical_yaml]:
             
             #Adding leadership roles
             if 'leadership_roles' in item:
-                print('found roles')
+                #print('found roles')
                 for role in item['leadership_roles']:
-                    print('adding roles')
+                    #print('adding roles')
                     start = date(*[int(i) for i in role['start'].split('-')])
 
                     end = date(*[int(i) for i in role['end'].split('-')]) if 'end' in role else None

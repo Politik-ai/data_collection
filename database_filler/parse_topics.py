@@ -5,7 +5,7 @@ sys.path.insert(1, '../')
 from get_all_data_files import all_high_level_data_files
 import json
 import os, csv
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Boolean, exists
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Boolean, exists, select
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 
@@ -46,16 +46,24 @@ def insert_topics():
 
             top_term = data['subjects_top_term']
             add_topic_if_new(top_term)
-
-            bill_id = f[2] + f[3] + f[4] + '-' + f[1]
+            parts = f.split('/')
+            #print(f)
+            bill_id = parts[3] + '-' + parts[0]
+            #print(bill_id)
 
             for topic in data['subjects']:
                 add_topic_if_new(topic)
+                #print(topic)
+                print('query:')
+                topics = session.query(topics).all()
+                #topic_id = session.execute("SELECT * FROM topics WHERE topic_name = topic_name VALUES (:topic_name)",
+                 #d{"topic_name": topic})
+                topic_id = 1
 
                 # link and add to database
                 session.execute(
                     "INSERT INTO bill_topics(bill_id, topic_id) VALUES (:bill_id, :topic_id)",
-                    {"bill_id": bill_id, "topic_id": topic}
+                    {"bill_id": bill_id, "topic_id": topic_id}
                 )
 
             session.commit()
@@ -64,7 +72,7 @@ def insert_topics():
 #just making sure this works
 if __name__ == "__main__":
     engine = create_engine('sqlite:///../political_db.db', echo=False)
-    session = scoped_session(sessionmaker(bind=engine))
+    session = sessionmaker(bind=engine)()
 
     relative_congress_loc = "../../congress/data/"
 
