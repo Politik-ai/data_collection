@@ -27,7 +27,7 @@ def insert_topics():
 
         if not exist:
             num_topics += 1
-            print(f'adding new topic: {num_topics}')
+            #print(f'adding new topic: {num_topics}')
             session.execute(
                 "INSERT INTO topics(topic_name) VALUES (:topic_name)", {"topic_name": topic}
             )
@@ -37,7 +37,7 @@ def insert_topics():
     i = 0
     for f in files:
         i += 1
-        print(f"File Number: {i}")
+        #print(f"File Number: {i}")
         path = relative_congress_loc + f + '/data.json'
         path = os.path.abspath(path)
         with open(path) as x:
@@ -47,15 +47,15 @@ def insert_topics():
             top_term = data['subjects_top_term']
             add_topic_if_new(top_term)
 
-            bill_state_id = f[2] + f[3] + f[4] + '-' + f[1]
+            bill_id = f[2] + f[3] + f[4] + '-' + f[1]
 
             for topic in data['subjects']:
                 add_topic_if_new(topic)
 
                 # link and add to database
                 session.execute(
-                    "INSERT INTO bill_topics(bill_state_id, topic_id) VALUES (:bill_state_id, :topic_id)",
-                    {"bill_state_id": bill_state_id, "topic_id": topic}
+                    "INSERT INTO bill_topics(bill_id, topic_id) VALUES (:bill_id, :topic_id)",
+                    {"bill_id": bill_id, "topic_id": topic}
                 )
 
             session.commit()
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     bill_topics = Table(
         'bill_topics', meta,
         Column('id', Integer, primary_key=True),
-        Column('bill_state_id', Integer),
+        Column('bill_id', Integer),
         Column('topic_id', String),
         Column('top', Boolean),
         sqlite_autoincrement=True

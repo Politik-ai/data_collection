@@ -19,24 +19,24 @@ def insert_sponsors():
             sponsor_type = 'primary'
             state = data['sponsor']['state']
             title = data['sponsor']['title']
-            bill_state_id = data['bill_id']
+            bill_id = data['bill_id']
             politician_id = data['sponsor']['bioguide_id']
             # link and add to database
             db.execute(
-                "INSERT INTO sponsorship(sponsor_type, bill_state_id, politician_id) VALUES (:sponsor_type, :bill_state_id, :politician_id)",
-                {"sponsor_type": sponsor_type, "bill_state_id": bill_state_id, "politician_id": politician_id}
+                "INSERT INTO sponsorship(sponsor_type, bill_id, politician_id) VALUES (:sponsor_type, :bill_id, :politician_id)",
+                {"sponsor_type": sponsor_type, "bill_id": bill_id, "politician_id": politician_id}
             )
 
             for cosp in data['cosponsors']:
                 sponsor_type = 'cosponsor'
                 state = cosp['state']
                 title = cosp['title']
-                bill_state_id = data['bill_id']
+                bill_id = data['bill_id']
                 politician_id = cosp['bioguide_id']
                 # link and add to database
                 db.execute(
-                    "INSERT INTO sponsorship(sponsor_type, bill_state_id, politician_id) VALUES (:sponsor_type, :bill_state_id, :politician_id)",
-                    {"sponsor_type": sponsor_type, "bill_state_id": bill_state_id, "politician_id": politician_id}
+                    "INSERT INTO sponsorship(sponsor_type, bill_id, politician_id) VALUES (:sponsor_type, :bill_id, :politician_id)",
+                    {"sponsor_type": sponsor_type, "bill_id": bill_id, "politician_id": politician_id}
                 )
 
             db.commit()
@@ -55,7 +55,7 @@ if __name__ == "__main__":
         'sponsorship', meta,
         Column('id', Integer, primary_key=True),
         Column('sponsor_type', String),
-        Column('bill_state_id', String),
+        Column('bill_id', String),
         Column('politician_id', String),
         sqlite_autoincrement=True
     )

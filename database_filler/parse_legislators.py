@@ -44,7 +44,6 @@ meta.create_all(engine)
 conn = engine.connect()
 conn.execute(politician_term.delete())
 conn.execute(politician.delete())
-
 sess = sessionmaker()
 sess.configure(bind=engine)
 session = sess()
@@ -88,27 +87,27 @@ for y in [current_yaml, historical_yaml]:
                                                       legislative_body=body, gender=gender)
                 result = session.execute(ins)
 
-
-print(skips)
 meta.bind = engine
+session.commit()
+#print(skips)
 
-result = session.execute(politician_term.select())
-# result = conn.execute(s)
-if os.path.exists("pol_term.csv"):
-    os.remove("pol_term.csv")
-fh = open('pol_term.csv', 'w')
-outcsv = csv.writer(fh)
-outcsv.writerow([s for s in result.keys()])
-for row in result:
-    outcsv.writerow([s for s in row])
-fh.close
+# result = session.execute(politician_term.select())
+# # result = conn.execute(s)
+# if os.path.exists("pol_term.csv"):
+#     os.remove("pol_term.csv")
+# fh = open('pol_term.csv', 'w')
+# outcsv = csv.writer(fh)
+# outcsv.writerow([s for s in result.keys()])
+# for row in result:
+#     outcsv.writerow([s for s in row])
+# fh.close
 
-result = session.execute(politician.select())
-if os.path.exists("pol.csv"):
-    os.remove("pol.csv")
-fh = open('pol.csv', 'w')
-outcsv = csv.writer(fh)
-outcsv.writerows(result.keys())
-for row in result:
-    outcsv.writerow(row)
-fh.close
+# result = session.execute(politician.select())
+# if os.path.exists("pol.csv"):
+#     os.remove("pol.csv")
+# fh = open('pol.csv', 'w')
+# outcsv = csv.writer(fh)
+# outcsv.writerows(result.keys())
+# for row in result:
+#     outcsv.writerow(row)
+# fh.close
