@@ -34,7 +34,7 @@ def insert_bills():
         bill_state_dict["congress"] = f[1]
         bill_state_dict["bill_type"] = f[2]
         bill_state_dict["status_code"] = f[4]
-        bill_state_dict['id'] = f[2] + f[3] + f[4] + '-' + f[1]
+        bill_state_dict['bill_state_identifier'] = f[2] + f[3] + f[4] + '-' + f[1]
         bill_state_dict["bill_id"] = cur_bill_id
         
 
@@ -46,8 +46,8 @@ def insert_bills():
             bill_state_dict["intro_date"] = date(*[int(i) for i in dob.split('-')])
 
         session.execute(
-            "INSERT INTO bill_states(id, bill_id, bill_type, status_code, text_location, short_title, official_title, intro_date, congress) \
-            VALUES (:id, :bill_id, :bill_type, :status_code, :text_location, :short_title, :official_title, :intro_date, :congress)",
+            "INSERT INTO bill_states(bill_state_identifier, bill_id, bill_type, status_code, text_location, short_title, official_title, intro_date, congress) \
+            VALUES (:bill_state_identifier, :bill_id, :bill_type, :status_code, :text_location, :short_title, :official_title, :intro_date, :congress)",
             bill_state_dict)
 
     session.commit()
@@ -68,7 +68,8 @@ if __name__ == "__main__":
 
     bill_states = Table(
         'bill_states', meta,
-        Column('id', String, primary_key=True),
+        Column('id', Integer, primary_key=True),
+        Column('bill_state_identifier', String),
         Column('bill_id', Integer),
         Column('bill_type', String),
         Column('status_code', String),
