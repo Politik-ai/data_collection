@@ -71,7 +71,7 @@ if __name__ == "__main__":
         Column('id', Integer, primary_key=True),
         Column('bill_id', Integer),
         Column('topic_id', String),
-        Column('top', Boolean),
+        Column('calculated', Boolean),
         sqlite_autoincrement=True
     )
 
