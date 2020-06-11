@@ -58,12 +58,12 @@ class Leadership_Role(Base):
     start_date = Column('start_date', Date)
     end_date = Column('end_date', Date)
 
-    def __init__(self, role, chamber, start_date, end_date, pol_id):
+    def __init__(self, role, chamber, start_date, end_date, polid):
         self.role = role
         self.chamber = chamber
         self.start_date = start_date
         self.end_date = end_date
-        self.pol_id = pol_id
+        self.polid = polid
 
 #Bills Next
 
