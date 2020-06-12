@@ -8,57 +8,45 @@ import os, csv
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-def insert_sponsors():
-    files = all_high_level_data_files()
+from base import Session, engine, Base
+from framework import Bill, Sponsorship, Politician
 
-    for f in files:
-        path = relative_congress_loc + f + '/data.json'
-        path = os.path.abspath(path)
-        with open(path) as x:
-            data = json.load(x)
-            sponsor_type = 'primary'
-            state = data['sponsor']['state']
-            title = data['sponsor']['title']
-            bill_id = data['bill_id']
-            politician_id = data['sponsor']['bioguide_id']
-            # link and add to database
-            db.execute(
-                "INSERT INTO sponsorship(sponsor_type, bill_id, politician_id) VALUES (:sponsor_type, :bill_id, :politician_id)",
-                {"sponsor_type": sponsor_type, "bill_id": bill_id, "politician_id": politician_id}
-            )
-
-            for cosp in data['cosponsors']:
-                sponsor_type = 'cosponsor'
-                state = cosp['state']
-                title = cosp['title']
-                bill_id = data['bill_id']
-                politician_id = cosp['bioguide_id']
-                # link and add to database
-                db.execute(
-                    "INSERT INTO sponsorship(sponsor_type, bill_id, politician_id) VALUES (:sponsor_type, :bill_id, :politician_id)",
-                    {"sponsor_type": sponsor_type, "bill_id": bill_id, "politician_id": politician_id}
-                )
-
-            db.commit()
+Base.metadata.create_all(engine)
+session  = Session()
+relative_congress_loc = "../../congress/data/"
 
 
-#just making sure this works
-if __name__ == "__main__":
-    engine = create_engine('sqlite:///../political_db.db')
-    db = scoped_session(sessionmaker(bind=engine))
+files = all_high_level_data_files()
 
-    relative_congress_loc = "../../congress/data/"
+for f in files:
+    path = relative_congress_loc + f + '/data.json'
+    path = os.path.abspath(path)
+    with open(path) as x:
+        data = json.load(x)
+        sponsor_type = 'primary'
+        #state = data['sponsor']['state']
+        #title = data['sponsor']['title']
+        bill_code = data['bill_id']
+        bill_id = session.query(Bill.id).filter(Bill.bill_code == bill_code).first()[0]
+        bioid = data['sponsor']['bioguide_id']
+        politician_id = session.query(Politician.id).filter(Politician.bioid == bioid).first()[0]
+        # link and add to database
+        if not bill_id or not politician_id:
+            print('skipping')
+            continue
+        new_sponsorship = Sponsorship(bill_id,politician_id,sponsor_type)
+        session.add(new_sponsorship)
 
-    meta = MetaData()
+        for cosp in data['cosponsors']:
+            sponsor_type = 'cosponsor'
+            bioid = cosp['bioguide_id']
+            politician_id = session.query(Politician.id).filter(Politician.bioid == bioid).first()
+            if not politician_id:
+                print('skipping a sponsorship, can\'t find politician')
+            continue
+            new_sponsorship = Sponsorship(bill_id,politician_id,sponsor_type)
+            session.add(new_sponsorship)
 
-    sponsorship = Table(
-        'sponsorship', meta,
-        Column('id', Integer, primary_key=True),
-        Column('sponsor_type', String),
-        Column('bill_id', String),
-        Column('politician_id', String),
-        sqlite_autoincrement=True
-    )
 
-    meta.create_all(engine)
-    insert_sponsors()
+session.commit()
+
