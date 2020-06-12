@@ -21,7 +21,8 @@ historical_yaml = 'congress-legislators/legislators-historical.yaml'
 congress_dir = '../../congress/'
 dirname = os.path.dirname(__file__)
 filename = os.path.join(dirname, congress_dir + current_yaml)
-skips = 0
+skips, pol_terms_added, pols_added = 0, 0, 0
+
 # open up the yaml files
 for y in [current_yaml, historical_yaml]:
     with open(congress_dir + y) as file:
@@ -39,6 +40,7 @@ for y in [current_yaml, historical_yaml]:
 
             new_pol = Politician(bioid, dob, first_name, last_name)
             session.add(new_pol)
+            pols_added += 1
             pol_id = session.query(Politician.id).filter(Politician.bioid == bioid).first()[0]
 
             #Adding Politician Terms
@@ -53,16 +55,15 @@ for y in [current_yaml, historical_yaml]:
                 district = None
                 if body == 'rep':
                     district = term['district']
-
+                
                 pol_term = Politician_Term(pol_id, start_date, end_date, party, \
                     state, body, gender, district)
                 session.add(pol_term)            
+                pol_terms_added += 1
 
             #Adding leadership roles
             if 'leadership_roles' in item:
-                #print('found roles')
                 for role in item['leadership_roles']:
-                    #print('adding roles')
                     start = date(*[int(i) for i in role['start'].split('-')])
                     end = date(*[int(i) for i in role['end'].split('-')]) if 'end' in role else None
 
@@ -70,4 +71,5 @@ for y in [current_yaml, historical_yaml]:
                     session.add(leader_role)
 
 session.commit()
-#print(skips)
+print(f"{pols_added} Politician added")
+print(f"{pol_terms_added} Politician_Terms added")

@@ -162,3 +162,32 @@ class Sponsorship(Base):
 
 
 #Votes
+class Vote(Base):
+    __tablename__ = "votes"
+    id = Column(Integer, primary_key=True)
+    bill_state_id = Column('bill_state_id', Integer)
+    vote_politicians = relationship("Vote_Politician")
+
+
+    def __init__(self, bill_state_id):
+        self.bill_state_id = bill_state_id
+
+
+class Vote_Politician(Base):
+    __tablename__ = 'vote_politicians'
+    id = Column(Integer, primary_key=True)
+    vote_id = Column(Integer, ForeignKey("votes.id"))
+    polid = Column(Integer, ForeignKey("politicians.id"))
+    """
+    -2 is Present (acts towards quarum, but not yay or nay)
+    -1 is Not Voting
+    0 is No
+    1 is Yes
+    """
+    response = Column('response', Integer)
+
+
+    def __init__(self,vote_id,polid, response):
+        self.vote_id = vote_id
+        self.polid = polid
+        self.response = response

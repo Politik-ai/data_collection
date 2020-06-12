@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
-
-import sys
 import json
 import os
-
-print(os.getcwd())
 
 congress_data_dir = "../../congress/data"
 
