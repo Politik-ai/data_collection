@@ -165,7 +165,7 @@ class Sponsorship(Base):
 class Vote(Base):
     __tablename__ = "votes"
     id = Column(Integer, primary_key=True)
-    bill_state_id = Column('bill_state_id', Integer)
+    bill_state_id = Column(Integer, ForeignKey("bill_states.id"))
     vote_politicians = relationship("Vote_Politician")
 
 
