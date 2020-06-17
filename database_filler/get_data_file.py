@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-congress_data_dir = '../../congress/data/'
-
 # get all congress bills
 def get_data_path(bill_state_path):
 

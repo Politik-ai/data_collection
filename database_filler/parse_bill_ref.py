@@ -16,7 +16,6 @@ files = all_high_level_data_files()
 ref_num = 0
 for f in files:
     path = relative_congress_loc + f + '/data.json'
-    path = os.path.abspath(path)
     with open(path) as x:
         data = json.load(x)
         
@@ -29,5 +28,5 @@ for f in files:
                 bill_ref = Bill_Reference(from_bill.id,to_bill.id)
                 session.add(bill_ref)
 
-print(f'Total References Found: {ref_num}')
+print(f'References Added: {ref_num}')
 session.commit()

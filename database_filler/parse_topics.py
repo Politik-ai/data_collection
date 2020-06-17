@@ -14,6 +14,7 @@ from framework import Bill, Topic, Bill_Topic
 Base.metadata.create_all(engine)
 session  = Session()
 relative_congress_loc = "../../congress/data/"
+num_topics, num_bill_topics = 0, 0
 
 def add_topic_if_new(topic):
     topic_dict = {}
@@ -22,6 +23,8 @@ def add_topic_if_new(topic):
     if not exist:
         new_topic = Topic(topic)
         session.add(new_topic)
+        global num_topics
+        num_topics += 1
 
 files = all_high_level_data_files()
 i = 0
@@ -44,6 +47,9 @@ for f in files:
             topic_id = session.query(Topic).filter(Topic.name == t_name).first().id
             new_bill_topic = Bill_Topic(bill.id,topic_id)
             session.add(new_bill_topic)
+            num_bill_topics += 1
 
+print(f"{num_topics} Topics Added")
+print(f"{num_bill_topics} Bill Topics Added")
 session.commit()
 

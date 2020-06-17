@@ -1,3 +1,5 @@
+pip3 install -r requirements.txt
+
 
 DB=political_db.db
 if test -f "$DB"; then
@@ -7,15 +9,15 @@ fi
 
 cd database_filler
 ./parse_legislators.py
-echo "Added legislators"
+echo "Finished legislators"
 ./parse_bills.py
-echo "Added bills"
+echo "Finished bills"
 ./parse_sponsor.py
-echo "Added Sponsors"
+echo "Finished Sponsors"
 ./parse_bill_ref.py
-echo "Added Bill Refs"
+echo "Finished Bill Refs"
 ./parse_topics.py
-echo "Added Topics"
-#./parse_votes.py
-#echo "Added votes"
+echo "Finished Topics"
+./parse_votes.py
+echo "Finished votes"
 cd .. 

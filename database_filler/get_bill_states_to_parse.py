@@ -2,11 +2,8 @@
 #create nested structure to comb through all bills and gather required information. 
 import os
 
-
-#get all congress bills
 def get_bill_state_paths():
 
-    #print(os.path.abspath(__file__))
     congress_data_dir = '../../congress/data/'
 
     total_files = []
@@ -26,7 +23,7 @@ def get_bill_state_paths():
                 id_num += 1
                 if os.path.isdir(cur_path_3 + '/text-versions'):
                     bill_states = [f.name for f in os.scandir(cur_path_3 + '/text-versions') if f.is_dir()]
-
+                    
                     for bill_state in bill_states:
                         cur_path_4 = cur_path_3 + '/text-versions/' + bill_state
                         cur_path_4 = cur_path_4[len(congress_data_dir):]
@@ -34,7 +31,4 @@ def get_bill_state_paths():
                         bill_info = [id_num, congress, bill_type, bill_num_only, bill_state, cur_path_4]
                         total_files.append(bill_info)
                         i += 1
-                        #print(bill_info)
     return total_files
-
-get_bill_state_paths()
