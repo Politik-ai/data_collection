@@ -8,10 +8,13 @@ def get_all_vote_dirs():
     all_vote_dirs = []
     for congress in os.listdir(congress_data_dir):
         votes_dir = congress_data_dir + "/" + congress + "/votes"
-        for session in os.listdir(votes_dir):
-            session_dir = votes_dir + "/" + session
-            for vote in os.listdir(session_dir):
-                all_vote_dirs.append(session_dir + "/" + vote)
+        if os.path.isdir(votes_dir):
+            for session in os.listdir(votes_dir):
+                session_dir = votes_dir + "/" + session
+                for vote in os.listdir(session_dir):
+                    all_vote_dirs.append(session_dir + "/" + vote)
+        else:
+            print(f'can\'t get votes for {votes_dir}')
     return all_vote_dirs
 
 def get_vote_entries():
@@ -24,3 +27,4 @@ def get_vote_entries():
                 votes = data["votes"]
                 [entries.add(vote) for vote in votes if vote not in entries]
     return entries
+

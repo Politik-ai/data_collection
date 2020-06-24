@@ -28,30 +28,41 @@ for f in files:
         num_bills += 1
         cur_bill = session.query(Bill).filter(Bill.bill_code == bill_code).first()
         cur_bill_id = f[0]  
+        #print(f'added bill {cur_bill_id}')
   
     #get titles from json, short and official
-    with open(bill_data_path) as x:
-        data = json.load(x)
-        short_title = data['short_title']
-        official_title = data['official_title']
+    if os.path.isfile(bill_data_path):
+        with open(bill_data_path) as x:
+            data = json.load(x)
+            short_title = data['short_title']
+            official_title = data['official_title']
 
-    congress = f[1]
-    bill_type = f[2]
-    status_code = f[4]
-    bill_state_identifier = f[2] + f[3] + f[4] + '-' + f[1]
-    text_location = os.path.abspath(f[5] + "/document.txt")
+        congress = f[1]
+        bill_type = f[2]
+        status_code = f[4]
+        bill_state_identifier = f[2] + f[3] + f[4] + '-' + f[1]
+        text_location = os.path.abspath(f[5] + "/document.txt")
 
-    with open(relative_congress_loc + f[5] + '/data.json') as x:
-        data = json.load(x)
-        dob = data["issued_on"]
-        intro_date = date(*[int(i) for i in dob.split('-')])
+        if os.path.isfile(relative_congress_loc + f[5] + '/data.json'):
+            with open(relative_congress_loc + f[5] + '/data.json') as x:
+                data = json.load(x)
+                dob = data["issued_on"]
+                intro_date = date(*[int(i) for i in dob.split('-')])
 
-    bill_state_info = [cur_bill,cur_bill.id,bill_state_identifier,bill_type,status_code, \
-        text_location,short_title,official_title,intro_date,congress]
+            bill_state_info = [cur_bill,cur_bill.id,bill_state_identifier,bill_type,status_code, \
+                text_location,short_title,official_title,intro_date,congress]
 
-    new_bill_state = Bill_State(*bill_state_info)
-    session.add(new_bill_state)
-    num_bill_states += 1
+            new_bill_state = Bill_State(*bill_state_info)
+            session.add(new_bill_state)
+            num_bill_states += 1
+            #print(f'added bill state {num_bill_states}')
+        else:
+            #print(f"bill_state json {relative_congress_loc + f[5] + '/data.json'} not found")
+            continue
+    else:
+        print(f'bill json {bill_data_path} not found')
+        continue
+
 
 print(f"{num_bills} Bill Added")
 print(f"{num_bill_states} Bill States Added")

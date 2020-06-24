@@ -9,7 +9,7 @@ def get_bill_state_paths():
     total_files = []
     i = 0 
     id_num = 0
-    congresses = [f.name  for f in os.scandir(congress_data_dir) if f.is_dir()]
+    congresses = [f.name  for f in os.scandir(congress_data_dir) if f.is_dir() and f.name.isdigit()]
     for congress in congresses:
         cur_path_1 = congress_data_dir + congress + '/bills'
         bill_types = [f.name for f in os.scandir(cur_path_1) if f.is_dir()]

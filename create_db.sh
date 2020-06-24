@@ -1,5 +1,3 @@
-pip3 install -r requirements.txt
-
 
 DB=political_db.db
 if test -f "$DB"; then
