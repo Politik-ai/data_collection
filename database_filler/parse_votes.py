@@ -44,7 +44,7 @@ for vote_dir in all_voting_dirs:
             date_diffs = [[bill_state.intro_date-vote_date, bill_state.id] for bill_state in matching_bill_states]
             bill_state_id = min(date_diffs, key = lambda t: t[0])[1]
 
-            session.add(Vote(bill_state_id))
+            session.add(Vote(bill_state_id, vote_date))
             num_votes += 1
             vote_id = session.query(Vote).filter(Vote.bill_state_id == bill_state_id).first().id
 

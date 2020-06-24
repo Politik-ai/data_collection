@@ -43,7 +43,10 @@ for y in [current_yaml, historical_yaml]:
             new_pol = Politician(bioid, thomas_id, dob, first_name, last_name)
             session.add(new_pol)
             pols_added += 1
-            pol_id = session.query(Politician.id).filter(Politician.bioid == bioid).first()[0]
+            try:
+                pol_id = session.query(Politician.id).filter(Politician.bioid == bioid).first()[0]
+            except:
+                continue
 
             #Adding Politician Terms
             for term in item['terms']:
