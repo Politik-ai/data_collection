@@ -32,7 +32,7 @@ num_total_files = len(files)
 skips = 0
 for f in files:
     i += 1
-    print(f"{i}/{num_total_files}")
+    #print(f"{i}/{num_total_files}")
     path = relative_congress_loc + f + '/data.json'
     path = os.path.abspath(path)
     with open(path) as x:

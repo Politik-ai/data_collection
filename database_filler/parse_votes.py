@@ -17,24 +17,29 @@ all_voting_dirs = get_all_vote_dirs()
 num_votes, num_pol_votes = 0, 0
 i, skips, total_len = 0, 0, len(all_voting_dirs)
 for vote_dir in all_voting_dirs:
+    
     i += 1
-    print(f"{i}/{total_len}")
+    #print(f"{i}/{total_len}")
     with open(vote_dir + "/data.json") as f:
         data = json.load(f)
         if "bill" in data:
 
+            #print('bill_id_found')
             bill_code = data["bill"]["type"] + str(data["bill"]["number"]) + "-" + str(data["bill"]["congress"])
             vote_name = data["vote_id"]
             bill_id = session.query(Bill.id).filter(Bill.bill_code == bill_code).first()
+
             if not bill_id:
                 print(f'no bill code found in database: {bill_code}')
                 continue
+            
             bill_id = bill_id[0]
             matching_bill_states = session.query(Bill_State).filter(Bill_State.bill_id == bill_id).all()
             vote_date = datetime.strptime(data['date'][:-6], date_format).date()
             if not matching_bill_states:
                 print('skipping, no matching bill_states found!')
                 continue
+            
             #NOTE: If there are no matching bill_states, what to do? For not skip, but better long term action?
             """
             Select all bill_states that match bill_id and
@@ -62,8 +67,9 @@ for vote_dir in all_voting_dirs:
                 else:
                     print(f"Not supported vote type: {vote_type}")
         else:
-            print('no bill id in vote data')
-                
+            #print('no bill id in vote data')
+            continue
+
 print(f'{num_votes} Votes Added')
 print(f'{num_pol_votes} Politician Votes Added')
 session.commit()

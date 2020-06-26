@@ -21,6 +21,7 @@ for f in files:
     data_file = get_data_path(f)
     bill_data_path = relative_congress_loc + data_file + '/data.json'
 
+    data = None
     if f[0] != cur_bill_id:
         bill_code = f[2] + f[3]+ '-' + f[1]
         originating_body = f[2]
@@ -44,7 +45,6 @@ for f in files:
                 data = json.load(x)
             short_title = data['short_title']
             official_title = data['official_title']
-
         congress = f[1]
         bill_type = f[2]
         status_code = f[4]
