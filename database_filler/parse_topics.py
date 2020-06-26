@@ -28,8 +28,11 @@ def add_topic_if_new(topic):
 
 files = all_high_level_data_files()
 i = 0
+num_total_files = len(files)
+skips = 0
 for f in files:
     i += 1
+    #print(f"{i}/{num_total_files}")
     path = relative_congress_loc + f + '/data.json'
     path = os.path.abspath(path)
     with open(path) as x:
@@ -41,14 +44,17 @@ for f in files:
         parts = f.split('/')
         bill_code = parts[3] + '-' + parts[0]
         bill = session.query(Bill).filter(Bill.bill_code == bill_code).first()
-
+        if not bill:
+            print(f'skipping bill {bill_code}')
+            skips +=1
+            continue
         for t_name in data['subjects']:
             add_topic_if_new(t_name)
             topic_id = session.query(Topic).filter(Topic.name == t_name).first().id
             new_bill_topic = Bill_Topic(bill.id,topic_id)
             session.add(new_bill_topic)
             num_bill_topics += 1
-
+print(f"{skips} Bills skipped")
 print(f"{num_topics} Topics Added")
 print(f"{num_bill_topics} Bill Topics Added")
 session.commit()

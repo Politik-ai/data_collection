@@ -8,23 +8,24 @@ from base import Base
 
 
 #Legislators first!
-
 class Politician(Base):
     __tablename__ = 'politicians'
     id = Column(Integer, primary_key=True)
     bioid = Column('bioid', String)
+    thomas_id = Column('thomas_id', Integer)
     date_of_birth = Column('date_of_birth', String)
     first_name = Column('first_name', String)
     last_name = Column('last_name', String)
     terms = relationship("Politician_Term")
     roles = relationship("Leadership_Role")
 
-    def __init__(self, bioid, date_of_birth, first_name, last_name):
+    def __init__(self, bioid, thomas_id, date_of_birth, first_name, last_name):
         self.bioid = bioid
+        self.thomas_id = thomas_id
         self.date_of_birth = date_of_birth
         self.first_name = first_name
-        self.last_name = last_name    
-
+        self.last_name = last_name   
+        
 
 class Politician_Term(Base):
     __tablename__ = "politician_terms"
@@ -65,12 +66,12 @@ class Leadership_Role(Base):
         self.end_date = end_date
         self.polid = polid
 
-#Bills Next
-
 class Bill(Base):
     __tablename__ = "bills"
     id = Column(Integer, primary_key=True)
     bill_code = Column('bill_code', String)
+    status = Column('Status', String)
+    originating_body = Column('originating_body', String)
 
     #references_to_id = Column(Integer, ForeignKey("bill_references.id"))
     #references_from_id = Column(Integer, ForeignKey("bill_references.id"))
@@ -81,8 +82,10 @@ class Bill(Base):
     topics = relationship("Bill_Topic")
     bill_states = relationship("Bill_State", back_populates='bill')
 
-    def __init__(self, bill_code):
+    def __init__(self, bill_code, status, originating_body):
         self.bill_code = bill_code
+        self.status = status
+        self.originating_body = originating_body
 
 class Bill_State(Base):
     __tablename__ = "bill_states"
@@ -114,7 +117,6 @@ class Bill_State(Base):
 
 
 # Bill_ref next 
-
 class Bill_Reference(Base):
     __tablename__ = "bill_references"
     id = Column(Integer, primary_key=True)
@@ -126,7 +128,6 @@ class Bill_Reference(Base):
         self.to_bill_id = from_bill_id
 
 #Bill Topics
-
 class Topic(Base):
     __tablename__ = "topics"
     id = Column(Integer, primary_key=True)
@@ -147,7 +148,6 @@ class Bill_Topic(Base):
         self.topic_id = topic_id
 
 #Sponsorhip Adding
-
 class Sponsorship(Base):
     __tablename__ = "sponsorships"
     id = Column(Integer, primary_key=True)
@@ -167,10 +167,12 @@ class Vote(Base):
     id = Column(Integer, primary_key=True)
     bill_state_id = Column(Integer, ForeignKey("bill_states.id"))
     vote_politicians = relationship("Vote_Politician")
+    vote_date = Column('vote_date', Date)
 
 
-    def __init__(self, bill_state_id):
+    def __init__(self, bill_state_id, vote_date):
         self.bill_state_id = bill_state_id
+        self.vote_date = vote_date
 
 
 class Vote_Politician(Base):
@@ -185,7 +187,6 @@ class Vote_Politician(Base):
     1 is Yes
     """
     response = Column('response', Integer)
-
 
     def __init__(self,vote_id,polid, response):
         self.vote_id = vote_id
