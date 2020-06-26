@@ -70,6 +70,8 @@ class Bill(Base):
     __tablename__ = "bills"
     id = Column(Integer, primary_key=True)
     bill_code = Column('bill_code', String)
+    status = Column('Status', String)
+    originating_body = Column('originating_body', String)
 
     #references_to_id = Column(Integer, ForeignKey("bill_references.id"))
     #references_from_id = Column(Integer, ForeignKey("bill_references.id"))
@@ -80,8 +82,10 @@ class Bill(Base):
     topics = relationship("Bill_Topic")
     bill_states = relationship("Bill_State", back_populates='bill')
 
-    def __init__(self, bill_code):
+    def __init__(self, bill_code, status, originating_body):
         self.bill_code = bill_code
+        self.status = status
+        self.originating_body = originating_body
 
 class Bill_State(Base):
     __tablename__ = "bill_states"

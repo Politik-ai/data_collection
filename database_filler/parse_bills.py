@@ -23,7 +23,14 @@ for f in files:
 
     if f[0] != cur_bill_id:
         bill_code = f[2] + f[3]+ '-' + f[1]
-        new_bill = Bill(bill_code)
+        originating_body = f[2]
+        if os.path.isfile(bill_data_path):
+            with open(bill_data_path) as x:
+                data = json.load(x)
+                status = data['status']
+        else:
+            status = None
+        new_bill = Bill(bill_code, status, originating_body)
         session.add(new_bill)
         num_bills += 1
         cur_bill = session.query(Bill).filter(Bill.bill_code == bill_code).first()
@@ -33,7 +40,8 @@ for f in files:
     #get titles from json, short and official
     if os.path.isfile(bill_data_path):
         with open(bill_data_path) as x:
-            data = json.load(x)
+            if not data:
+                data = json.load(x)
             short_title = data['short_title']
             official_title = data['official_title']
 
