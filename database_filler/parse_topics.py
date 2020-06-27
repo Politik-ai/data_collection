@@ -35,6 +35,8 @@ for f in files:
     #print(f"{i}/{num_total_files}")
     path = relative_congress_loc + f + '/data.json'
     path = os.path.abspath(path)
+    if not os.path.isfile(path):
+        continue
     with open(path) as x:
 
         data = json.load(x)
