@@ -70,7 +70,7 @@ class Bill(Base):
     __tablename__ = "bills"
     id = Column(Integer, primary_key=True)
     bill_code = Column('bill_code', String)
-    status = Column('Status', String)
+    status = Column('status', String)
     originating_body = Column('originating_body', String)
 
     #references_to_id = Column(Integer, ForeignKey("bill_references.id"))
