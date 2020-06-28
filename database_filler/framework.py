@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from sqlalchemy import Column, String, Integer, Date, Table, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -37,7 +38,7 @@ class Politician_Term(Base):
     state = Column('state', String)
     legislative_body = Column('legislative_body', String)
     gender = Column('gender', String)
-    district = Column('district', String)
+    district = Column('district', Integer)
     
 
     def __init__(self, polid, start_date, end_date, party, state, legislative_body, gender, district):
@@ -83,6 +84,7 @@ class Bill(Base):
     bill_states = relationship("Bill_State", back_populates='bill')
 
     def __init__(self, bill_code, status, originating_body):
+        self.id = None
         self.bill_code = bill_code
         self.status = status
         self.originating_body = originating_body
