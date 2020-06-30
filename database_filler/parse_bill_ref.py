@@ -10,7 +10,7 @@ from framework import Bill_Reference, Bill
 Base.metadata.create_all(engine)
 session  = Session()
 
-relative_congress_loc = "../../congress/data/"
+relative_congress_loc = "ProjectAI/congress/data"
 
 files = all_high_level_data_files()
 ref_num = 0

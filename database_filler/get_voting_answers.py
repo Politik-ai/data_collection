@@ -2,7 +2,7 @@
 import json
 import os
 
-congress_data_dir = "../../congress/data"
+congress_data_dir = "ProjectAI/congress/data"
 
 def get_all_vote_dirs():
     all_vote_dirs = []

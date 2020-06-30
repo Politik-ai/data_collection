@@ -18,7 +18,7 @@ session  = Session()
 
 current_yaml = 'congress-legislators/legislators-current.yaml'
 historical_yaml = 'congress-legislators/legislators-historical.yaml'
-congress_dir = '../../congress/'
+congress_dir = '/home/jmaguila/Documents/ProjectAI/congress'
 dirname = os.path.dirname(__file__)
 filename = os.path.join(dirname, congress_dir + current_yaml)
 skips, pol_terms_added, pols_added = 0, 0, 0

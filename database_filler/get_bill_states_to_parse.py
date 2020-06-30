@@ -4,7 +4,7 @@ import os
 
 def get_bill_state_paths():
 
-    congress_data_dir = '../../congress/data/'
+    congress_data_dir = 'ProjectAI/congress/data'
 
     total_files = []
     i = 0 
