@@ -13,6 +13,7 @@ class Politician(Base):
     __tablename__ = 'politicians'
     id = Column(Integer, primary_key=True)
     bioid = Column('bioid', String)
+    lis = Column('lis', String)
     thomas_id = Column('thomas_id', Integer)
     date_of_birth = Column('date_of_birth', String)
     first_name = Column('first_name', String)
@@ -20,12 +21,13 @@ class Politician(Base):
     terms = relationship("Politician_Term")
     roles = relationship("Leadership_Role")
 
-    def __init__(self, bioid, thomas_id, date_of_birth, first_name, last_name):
+    def __init__(self, bioid, thomas_id, date_of_birth, first_name, last_name, lis):
         self.bioid = bioid
         self.thomas_id = thomas_id
         self.date_of_birth = date_of_birth
         self.first_name = first_name
-        self.last_name = last_name   
+        self.last_name = last_name
+        self.lis = lis   
         
 
 class Politician_Term(Base):
@@ -79,7 +81,7 @@ class Bill(Base):
     #references_to = relationship("Bill_Reference", foreign_keys=[references_to_id])
     #references_from = relationship("Bill_Reference", foreign_keys=[references_from_id])
 
-    sponsors = relationship("Sponsorship")
+    #sponsors = relationship("Sponsorship")
     topics = relationship("Bill_Topic")
     bill_states = relationship("Bill_State", back_populates='bill')
 

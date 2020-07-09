@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 from get_voting_answers import get_all_vote_dirs
 from base import Session, engine, Base
-from framework import Bill, Vote, Vote_Politician, Bill_State
+from framework import Bill, Vote, Vote_Politician, Bill_State, Politician
 
 session = Session()
 relative_congress_loc = "../../congress/data/"
@@ -19,7 +19,7 @@ i, skips, total_len = 0, 0, len(all_voting_dirs)
 for vote_dir in all_voting_dirs:
     
     i += 1
-    #print(f"{i}/{total_len}")
+    print(f"{i}/{total_len}")
     with open(vote_dir + "/data.json") as f:
         data = json.load(f)
         if "bill" in data:
@@ -58,9 +58,15 @@ for vote_dir in all_voting_dirs:
                     for pol_vote in data["votes"][vote_type]:
                         try:
                             num_pol_votes += 1
-                            #print(pol_vote)
-                            #print(vote_type)
-                            session.add(Vote_Politician(vote_id,pol_vote["id"],answer_dict[vote_type]))
+
+                            polid = session.query(Politician).filter(Politician.bioid == pol_vote["id"]).first()
+                            if not polid:
+                                polid = session.query(Politician).filter(Politician.lis == pol_vote['id']).first()
+                                if not polid:
+                                    print('failed to get polid from bioid or lis')
+                                    continue
+                            
+                            session.add(Vote_Politician(vote_id,polid.id,answer_dict[vote_type]))
                         except:
                             print('unknown pol_vote type, should be dict:')
                             print(pol_vote)

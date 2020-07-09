@@ -35,12 +35,13 @@ for y in [current_yaml, historical_yaml]:
                 skips += 1
                 continue
             bioid = item['id']['bioguide']
+            lis = item['id'].get('lis', None)
             first_name = item['name']['first']
             last_name = item['name']['last']
             thomas_id = item['id'].get('thomas', None)
 
 
-            new_pol = Politician(bioid, thomas_id, dob, first_name, last_name)
+            new_pol = Politician(bioid, thomas_id, dob, first_name, last_name, lis)
             session.add(new_pol)
             pols_added += 1
             try:
