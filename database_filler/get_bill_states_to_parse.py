@@ -12,6 +12,9 @@ def get_bill_state_paths():
     congresses = [f.name  for f in os.scandir(congress_data_dir) if f.is_dir() and f.name.isdigit()]
     for congress in congresses:
         cur_path_1 = congress_data_dir + congress + '/bills'
+        if not os.path.exists(cur_path_1):
+            print('Not today kiddo')
+            continue
         bill_types = [f.name for f in os.scandir(cur_path_1) if f.is_dir()]
 
         for bill_type in bill_types:
