@@ -18,4 +18,3 @@ echo "Finished Bill Refs"
 echo "Finished Topics"
 ./parse_votes.py
 echo "Finished votes"
-cd .. 
