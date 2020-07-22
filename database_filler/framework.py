@@ -37,7 +37,7 @@ class Politician_Term(Base):
     state = Column('state', String)
     legislative_body = Column('legislative_body', String)
     gender = Column('gender', String)
-    district = Column('district', String)
+    district = Column('district', Integer)
     
 
     def __init__(self, polid, start_date, end_date, party, state, legislative_body, gender, district):
@@ -70,7 +70,7 @@ class Bill(Base):
     __tablename__ = "bills"
     id = Column(Integer, primary_key=True)
     bill_code = Column('bill_code', String)
-    status = Column('Status', String)
+    status = Column('status', String)
     originating_body = Column('originating_body', String)
 
     #references_to_id = Column(Integer, ForeignKey("bill_references.id"))
