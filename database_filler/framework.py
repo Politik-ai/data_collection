@@ -170,11 +170,12 @@ class Vote(Base):
     __tablename__ = "votes"
     id = Column(Integer, primary_key=True)
     bill_state_id = Column(Integer, ForeignKey("bill_states.id"))
+    bill_code = Column(String)
     vote_politicians = relationship("Vote_Politician")
     vote_date = Column('vote_date', Date)
 
-
-    def __init__(self, bill_state_id, vote_date):
+    def __init__(self, bill_code, bill_state_id, vote_date):
+        self.bill_code = bill_code
         self.bill_state_id = bill_state_id
         self.vote_date = vote_date
 
