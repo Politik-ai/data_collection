@@ -15,7 +15,7 @@ def add_votes(session, all_voting_dirs, existing_vote_info):
     for vote_dir in all_voting_dirs:
         
         i += 1
-        print(f"{i}/{total_len}")
+        #print(f"{i}/{total_len}")
         with open(vote_dir + "/data.json") as f:
             data = json.load(f)
             if "bill" in data:
@@ -25,7 +25,6 @@ def add_votes(session, all_voting_dirs, existing_vote_info):
                 vote_name = data["vote_id"]
                 vote_date = datetime.strptime(data['date'][:-6], date_format).date()
                 
-                print([bill_code, vote_date])
                 if [bill_code, vote_date] in existing_vote_info:
                     print('skipping')
                     continue
@@ -70,7 +69,6 @@ def add_votes(session, all_voting_dirs, existing_vote_info):
                                         continue
                                 
                                 session.add(Vote_Politician(vote_id,polid.id,answer_dict[vote_type]))
-                                print('added vote')
                             except:
                                 print('unknown pol_vote type, should be dict:')
                                 print(pol_vote)

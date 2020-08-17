@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import sys
 sys.path.insert(1, '../')
 import json
@@ -29,7 +28,7 @@ def add_topics(session, files, existing_bill_codes, existing_topics):
     skips = 0
     for f in files:
         i += 1
-        print(f"{i}/{num_total_files}")
+        #print(f"{i}/{num_total_files}")
         path = relative_congress_loc + f + '/data.json'
         path = os.path.abspath(path)
         if not os.path.isfile(path):
@@ -61,12 +60,3 @@ def add_topics(session, files, existing_bill_codes, existing_topics):
     print(f"{num_topics} Topics Added")
     print(f"{num_bill_topics} Bill Topics Added")
     session.commit()
-
-if __name__ == "__main__":
-
-
-    from get_all_data_files import all_high_level_data_files
-    session = Session()
-    bill_paths = all_high_level_data_files()
-
-    add_topics(session, bill_paths, [], [])

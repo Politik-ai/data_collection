@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
 import sys, os
-from base import Session
+from base import Session, Base, engine
 from framework import Bill, Topic, Bill_Topic, Politician, Bill_State, Vote
 from get_bill_states_to_parse import get_bill_state_paths
 from get_all_data_files import all_high_level_data_files
@@ -31,6 +32,7 @@ if os.path.exists("../political_db.db"):
     existing_vote_info = [[v.bill_code, v.vote_date] for v in votes]
 
 else:
+    Base.metadata.create_all(engine)
     existing_bill_state_identifiers = []
     existing_bill_codes = []
     existing_topics = []

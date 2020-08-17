@@ -1,18 +1,9 @@
 #!/usr/bin/env python3
-
-# AIM: to get all relevant information on all legislators into database
-
-# parse through yamls
 import yaml
 import os
 from datetime import date
 from sqlalchemy import Table, Column, Integer, String, Date, func
-#import csv
-from base import Session, engine, Base
 from framework import Politician, Politician_Term, Leadership_Role
-
-Base.metadata.create_all(engine)
-session  = Session()
 
 
 def add_legislators(session, existing_bioguides = []):

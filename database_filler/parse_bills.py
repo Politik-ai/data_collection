@@ -80,4 +80,3 @@ def add_bills_and_bill_states(session, files, existing_bill_codes = [], existing
     print(f"{num_bills} Bill Added")
     print(f"{num_bill_states} Bill States Added")
     session.commit()
-
