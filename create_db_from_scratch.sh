@@ -6,4 +6,4 @@ if test -f "$DB"; then
 fi
 
 cd database_filler
-./update.py
+python3 update.py
