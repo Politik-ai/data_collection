@@ -20,7 +20,6 @@ def add_votes(session, all_voting_dirs, existing_vote_info):
             data = json.load(f)
             if "bill" in data:
 
-                #print('bill_id_found')
                 bill_code = data["bill"]["type"] + str(data["bill"]["number"]) + "-" + str(data["bill"]["congress"])
                 vote_name = data["vote_id"]
                 vote_date = datetime.strptime(data['date'][:-6], date_format).date()
@@ -29,51 +28,42 @@ def add_votes(session, all_voting_dirs, existing_vote_info):
                     print('skipping')
                     continue
 
-                bill_id = session.query(Bill.id).filter(Bill.bill_code == bill_code).first()
+                bill = session.query(Bill).filter(Bill.bill_code == bill_code).first()
 
-                if not bill_id:
+                if not bill:
                     print(f'no bill code found in database: {bill_code}')
                     continue
-                
-                bill_id = bill_id[0]
-                matching_bill_states = session.query(Bill_State).filter(Bill_State.bill_id == bill_id).all()
-                
-                if not matching_bill_states:
-                    print('skipping, no matching bill_states found!')
-                    continue
-                
-                #NOTE: If there are no matching bill_states, what to do? For not skip, but better long term action?
-                """
-                Select all bill_states that match bill_id and
-                Sort that selection by DateDiff from Vote Date and
-                Select smallest positive diff as correct Bill_state.
-                """
-                date_diffs = [[bill_state.intro_date-vote_date, bill_state.id] for bill_state in matching_bill_states]
-                bill_state_id = min(date_diffs, key = lambda t: t[0])[1]
 
-                session.add(Vote(bill_code, bill_state_id, vote_date))
+                new_vote = Vote(bill_code, bill.id, vote_date)
+                #print("Added vote!")
+
                 num_votes += 1
-                vote_id = session.query(Vote).filter(Vote.bill_state_id == bill_state_id).first().id
 
                 for vote_type in data["votes"]:
                     if vote_type in answer_dict:
                         for pol_vote in data["votes"][vote_type]:
-                            try:
-                                num_pol_votes += 1
+                            #try:
+                            num_pol_votes += 1
 
-                                polid = session.query(Politician).filter(Politician.bioid == pol_vote["id"]).first()
-                                if not polid:
-                                    polid = session.query(Politician).filter(Politician.lis == pol_vote['id']).first()
-                                    if not polid:
-                                        print('failed to get polid from bioid or lis')
-                                        continue
-                                
-                                session.add(Vote_Politician(vote_id,polid.id,answer_dict[vote_type]))
-                            except:
-                                print('unknown pol_vote type, should be dict:')
-                                print(pol_vote)
+                            politician = session.query(Politician).filter(Politician.bioid == pol_vote["id"]).first()
+                            if not politician:
+                                politician = session.query(Politician).filter(Politician.lis == pol_vote['id']).first()
+                                if not politician:
+                                    print('failed to get polid from bioid or lis')
+                                    continue
+                            
+                            vote_pol = Vote_Politician(new_vote.id,answer_dict[vote_type], politician.id)
+                            vote_pol.politician = politician
+
+                            new_vote.vote_politicians.append(vote_pol)
+                            #print("Added vote pol!")
+                            #except:
+                            #    print('unknown pol_vote type, should be dict:')
+                            #    print(pol_vote)
                     else:
                         print(f"Not supported vote type: {vote_type}")
+                
+                session.add(new_vote)
             else:
                 #print('no bill id in vote data')
                 continue

@@ -41,7 +41,7 @@ def add_topics(session, files, existing_bill_codes, existing_topics):
             add_topic_if_new(top_term)
             bill_code = data['bill_id']
             if bill_code in existing_bill_codes:
-                print('skipping')
+                #print('skipping')
                 continue
 
             bill = session.query(Bill).filter(Bill.bill_code == bill_code).first()

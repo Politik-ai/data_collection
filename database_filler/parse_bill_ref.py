@@ -17,12 +17,11 @@ def add_bill_refs(session, files, existing_bill_codes = []):
         with open(path) as x:
             data = json.load(x)
             if data['bill_id'] in existing_bill_codes:
-                #print('skipping')
                 continue
             from_bill = session.query(Bill).filter(Bill.bill_code == data['bill_id']).first()
             if not from_bill:
                 #NOTE: WHY are these being skipped? Figure it out, most likely bug or issue due to current building
-                #print(f"skipping: {data['bill_id']}")
+                print(f"skipping: {data['bill_id']}")
                 continue
 
 

@@ -18,8 +18,14 @@ class Politician(Base):
     date_of_birth = Column('date_of_birth', String)
     first_name = Column('first_name', String)
     last_name = Column('last_name', String)
-    terms = relationship("Politician_Term")
-    roles = relationship("Leadership_Role")
+    terms = relationship("Politician_Term", back_populates="politician")
+    roles = relationship("Leadership_Role", back_populates="politician")
+
+    #votes = relationship("Vote_Politician", back_populates="politician")
+
+    sponsorships = relationship(
+        "Sponsorship",
+        back_populates='politician')
 
     def __init__(self, bioid, thomas_id, date_of_birth, first_name, last_name, lis):
         self.bioid = bioid
@@ -33,7 +39,8 @@ class Politician(Base):
 class Politician_Term(Base):
     __tablename__ = "politician_terms"
     id = Column(Integer, primary_key=True)
-    polid = Column(Integer, ForeignKey("politicians.id"))
+    politician_id = Column(Integer, ForeignKey("politicians.id"))
+    politician = relationship("Politician", back_populates = "terms")
     start_date = Column('start_date', Date)
     end_date = Column('end_date', Date)
     party = Column('party', String)
@@ -43,8 +50,8 @@ class Politician_Term(Base):
     district = Column('district', Integer)
     
 
-    def __init__(self, polid, start_date, end_date, party, state, legislative_body, gender, district):
-        self.polid = polid
+    def __init__(self, politician_id, start_date, end_date, party, state, legislative_body, gender, district):
+        self.politician_id = politician_id
         self.start_date = start_date
         self.end_date = end_date
         self.party = party
@@ -56,19 +63,22 @@ class Politician_Term(Base):
 class Leadership_Role(Base):
     __tablename__ = 'leadership_roles'
     id = Column(Integer, primary_key=True)
-    polid = Column(Integer, ForeignKey("politicians.id"))
+    politician_id = Column(Integer, ForeignKey("politicians.id"))
+    politician = relationship("Politician", back_populates = "roles")
     role = Column('role', String)
     chamber = Column('chamber', String)
     start_date = Column('start_date', Date)
     end_date = Column('end_date', Date)
 
-    def __init__(self, role, chamber, start_date, end_date, polid):
+    def __init__(self, role, chamber, start_date, end_date, politician_id):
         self.role = role
         self.chamber = chamber
         self.start_date = start_date
         self.end_date = end_date
-        self.polid = polid
+        self.politician_id = politician_id
 
+
+#Represents a bill, containing topic, sponsorship, and bill_state information as relations
 class Bill(Base):
     __tablename__ = "bills"
     id = Column(Integer, primary_key=True)
@@ -76,14 +86,24 @@ class Bill(Base):
     status = Column('status', String)
     originating_body = Column('originating_body', String)
 
-    #references_to_id = Column(Integer, ForeignKey("bill_references.id"))
-    #references_from_id = Column(Integer, ForeignKey("bill_references.id"))
-    #references_to = relationship("Bill_Reference", foreign_keys=[references_to_id])
-    #references_from = relationship("Bill_Reference", foreign_keys=[references_from_id])
+    sponsors = relationship(
+        "Sponsorship",
+        back_populates='bill')
 
-    #sponsors = relationship("Sponsorship")
-    topics = relationship("Bill_Topic")
-    bill_states = relationship("Bill_State", back_populates='bill')
+    topics = relationship(
+        "Topic", 
+        secondary = "bill_topics")
+
+    bill_states = relationship(
+        "Bill_State", 
+        back_populates='bill')
+
+
+    votes = relationship(
+        "Vote",
+        back_populates='bill'
+    )
+    
 
     def __init__(self, bill_code, status, originating_body):
         self.id = None
@@ -94,6 +114,7 @@ class Bill(Base):
 class Bill_State(Base):
     __tablename__ = "bill_states"
     id = Column(Integer, primary_key=True)
+
     bill_id = Column(Integer, ForeignKey("bills.id"))
     bill = relationship("Bill", back_populates='bill_states')
 
@@ -120,13 +141,36 @@ class Bill_State(Base):
         self.congress = congress
 
 
-# Bill_ref next 
+class Sponsorship(Base):
+    __tablename__ = "sponsorships"
+    id = Column(Integer, primary_key=True)
+
+    bill = relationship('Bill', back_populates = "sponsors")
+
+    politician = relationship("Politician", back_populates="sponsorships")
+
+    bill_id = Column(
+        Integer, 
+        ForeignKey("bills.id"))
+
+    politician_id = Column(
+        Integer, 
+        ForeignKey("politicians.id"))
+
+    sponsor_type = Column('sponsor_type', String)
+
+    def __init__(self,bill_id,politician_id,sponsor_type):
+        self.bill_id = bill_id
+        self.politician_id = politician_id
+        self.sponsor_type = sponsor_type
+
+
 class Bill_Reference(Base):
     __tablename__ = "bill_references"
     id = Column(Integer, primary_key=True)
-    to_bill_id = Column(Integer, ForeignKey("bills.id"))
-    from_bill_id = Column(Integer, ForeignKey("bills.id"))
-
+    from_bill_id = Column(Integer, ForeignKey("bills.id")) 
+    to_bill_id = Column(Integer, ForeignKey("bills.id")) 
+    
     def __init__(self, from_bill_id,to_bill_id):
         self.from_bill_id = from_bill_id
         self.to_bill_id = from_bill_id
@@ -151,40 +195,33 @@ class Bill_Topic(Base):
         self.bill_id = bill_id
         self.topic_id = topic_id
 
-#Sponsorhip Adding
-class Sponsorship(Base):
-    __tablename__ = "sponsorships"
-    id = Column(Integer, primary_key=True)
-    bill_id = Column(Integer, ForeignKey("bills.id"))
-    polid = Column(Integer, ForeignKey("politicians.id"))
-    sponsor_type = Column('sponsor_type', String)
-
-    def __init__(self,bill_id,polid,sponsor_type):
-        self.bill_id = bill_id
-        self.polid = polid
-        self.sponsor_type = sponsor_type
-
 
 #Votes
 class Vote(Base):
     __tablename__ = "votes"
     id = Column(Integer, primary_key=True)
-    bill_state_id = Column(Integer, ForeignKey("bill_states.id"))
-    bill_code = Column(String)
-    vote_politicians = relationship("Vote_Politician")
+    bill_id = Column(Integer, ForeignKey("bills.id"))
+    bill = relationship("Bill", back_populates = 'votes')
+    bill_code = Column('bill_code', String)
+
+    vote_politicians = relationship("Vote_Politician", back_populates='vote')
+
     vote_date = Column('vote_date', Date)
 
-    def __init__(self, bill_code, bill_state_id, vote_date):
+    def __init__(self, bill_code, bill_id, vote_date):
         self.bill_code = bill_code
-        self.bill_state_id = bill_state_id
+        self.bill_id = bill_id
         self.vote_date = vote_date
-
 
 class Vote_Politician(Base):
     __tablename__ = 'vote_politicians'
     id = Column(Integer, primary_key=True)
+
     vote_id = Column(Integer, ForeignKey("votes.id"))
-    polid = Column(Integer, ForeignKey("politicians.id"))
+    vote = relationship("Vote", back_populates='vote_politicians')
+
+    politician = relationship("Politician")
+    politician_id = Column(Integer, ForeignKey('politicians.id'))
     """
     -2 is Present (acts towards quarum, but not yay or nay)
     -1 is Not Voting
@@ -193,7 +230,7 @@ class Vote_Politician(Base):
     """
     response = Column('response', Integer)
 
-    def __init__(self,vote_id,polid, response):
+    def __init__(self,vote_id, response, politician_id):
         self.vote_id = vote_id
-        self.polid = polid
         self.response = response
+        self.politician_id = politician_id

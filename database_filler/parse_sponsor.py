@@ -13,8 +13,16 @@ from framework import Bill, Sponsorship, Politician
 
 def add_sponsors(session, files, existing_bill_codes = []):
 
+    bioid_pol_dict = {}
+    bioguide_id_to_polid = session.query(Politician.bioid, Politician).all()
+    for bioid, polid in bioguide_id_to_polid:
+        bioid_pol_dict[bioid] = polid
+
+    
+
     relative_congress_loc = "../../congress/data/"
     num_sponsors = 0
+    num_bills = 0
 
     for f in files:
         path = relative_congress_loc + f + '/data.json'
@@ -23,54 +31,69 @@ def add_sponsors(session, files, existing_bill_codes = []):
             continue
         with open(path) as x:
             data = json.load(x)
-            sponsor_type = 'primary'
+
             bill_code = data['bill_id']
 
             if bill_code in existing_bill_codes:
                 print('skipping')
                 continue
 
-
-
-            bill_id = session.query(Bill.id).filter(Bill.bill_code == bill_code).first()
-            if bill_id is None:
+            #Since bill has already been added, get it to build relations
+            bill = session.query(Bill).filter(Bill.bill_code == bill_code).first()
+            if bill is None:
                 continue
-            else:
-                bill_id = bill_id[0]
 
 
             sponsor = data.get('sponsor', None)
             if not sponsor:
-                print(f'no sponsor for {bill_code}')
+                print(f'no sponsor for {bill_code} :(')
                 continue
+            
+            #Grab bioid for marking, and try thomas ID if bioid not found
             bioid = sponsor.get('bioguide_id', None)
             if not bioid:
+                print('querying')
+
                 bioid = session.query(Politician.bioid).filter(Politician.thomas_id == sponsor['thomas_id']).first()[0]
                 
-            politician_id = session.query(Politician.id).filter(Politician.bioid == bioid).first()[0]
+            #Get pol for relation building
+            pol = bioid_pol_dict[bioid]
+            
             #link and add to database
-            if not bill_id or not politician_id:
-                print('skipping')
+            if not pol:
+                print('missing')
                 continue
-            new_sponsorship = Sponsorship(bill_id,politician_id,sponsor_type)
-            session.add(new_sponsorship)
+
+            primary_sponsor = Sponsorship(bill.id, pol.id, 'primary')
+            session.add(primary_sponsor)
+            bill.sponsors.append(primary_sponsor)
+            pol.sponsorships.append(primary_sponsor)
+
+            #session.add(primary_sponsor)
+
+            num_bills += 1
             num_sponsors += 1
 
             for cosp in data['cosponsors']:
                 
-                sponsor_type = 'cosponsor'
                 bioid = cosp.get('bioguide_id', None)
                 if not bioid:
-                    bioid = session.query(Politician.bioid).filter(Politician.thomas_id == cosp['thomas_id']).first()[0]
-                politician_id = session.query(Politician.id).filter(Politician.bioid == bioid).first()[0]
-                if not politician_id:
+                    print('querying')
+                    bioid = session.query(Politician.id).filter(Politician.thomas_id == cosp['thomas_id']).first()[0]
+                
+                pol = bioid_pol_dict[bioid]
+
+                if not pol:
                     print('Skipping a sponsorship, can\'t find politician...')
                     continue
-                new_sponsorship = Sponsorship(bill_id,politician_id,sponsor_type)
-                session.add(new_sponsorship)
+
+                co_sponsor = Sponsorship(bill.id, pol.id, 'cosponsor')
+                bill.sponsors.append(co_sponsor)
+                pol.sponsorships.append(co_sponsor)
+                session.add(co_sponsor)
+
                 num_sponsors += 1
 
-
-    print(f"{num_sponsors} Sponsors Added")
     session.commit()
+    print(f"{num_sponsors} Sponsors Added")
 

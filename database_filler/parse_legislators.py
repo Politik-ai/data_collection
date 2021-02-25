@@ -27,6 +27,7 @@ def add_legislators(session, existing_bioguides = []):
                 thomas_id = item['id'].get('thomas', None)
                 
                 if bioid in existing_bioguides:
+                    print('skipping adding politician')
                     #skip over bioguide if it doesn't exist
                     continue
 
@@ -42,9 +43,10 @@ def add_legislators(session, existing_bioguides = []):
                     continue
 
                 new_pol = Politician(bioid, thomas_id, dob, first_name, last_name, lis)
-                session.add(new_pol)
                 pols_added += 1
-                pol_id = session.query(Politician.id).filter(Politician.bioid == bioid).first()[0]
+
+
+                #pol_id = session.query(Politician.id).filter(Politician.bioid == bioid).first()[0]
 
                 #Adding Politician Terms
                 for term in item['terms']:
@@ -52,7 +54,9 @@ def add_legislators(session, existing_bioguides = []):
                     start_date = date(*[int(i) for i in term['start'].split('-')])
                     end_date = date(*[int(i) for i in term['end'].split('-')])
                     #arbitrary cutoff for old terms
+                    
                     if end_date.year < 1950:
+                        print('old peeps')
                         continue
 
                     party = term.get('party', "NA")
@@ -63,9 +67,10 @@ def add_legislators(session, existing_bioguides = []):
                     else:
                         district = None
                     
-                    pol_term = Politician_Term(pol_id, start_date, end_date, party, \
+                    pol_term = Politician_Term(new_pol.id, start_date, end_date, party, \
                         state, body, gender, district)
-                    session.add(pol_term)            
+                    
+                    new_pol.terms.append(pol_term)            
                     pol_terms_added += 1
 
                 #Adding leadership roles
@@ -74,8 +79,12 @@ def add_legislators(session, existing_bioguides = []):
                         start = date(*[int(i) for i in role['start'].split('-')])
                         end = date(*[int(i) for i in role['end'].split('-')]) if 'end' in role else None
 
-                        leader_role = Leadership_Role(role['title'], role['chamber'], start, end, pol_id)
-                        session.add(leader_role)
+                        leader_role = Leadership_Role(role['title'], role['chamber'], start, end, new_pol.id)
+                        new_pol.roles.append(leader_role)
+
+                session.add(new_pol)
+                print(f'adding pol and terms! {pols_added}')
+
 
     session.commit()
     print(f"{pols_added} Politician added")
