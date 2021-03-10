@@ -22,8 +22,11 @@ def add_sponsors(session, files, existing_bill_codes = []):
 
     relative_congress_loc = "../../congress/data/"
     num_sponsors = 0
-    num_bills = 0
 
+    sponsors_to_add = []
+    cur_batch = 0
+    total_files = len(files)
+    file_ind = 0
     for f in files:
         path = relative_congress_loc + f + '/data.json'
         path = os.path.abspath(path)
@@ -32,17 +35,20 @@ def add_sponsors(session, files, existing_bill_codes = []):
         with open(path) as x:
             data = json.load(x)
 
+
+            file_ind += 1
+            print(f'Sponsor file {file_ind}/{total_files}')
+
             bill_code = data['bill_id']
 
             if bill_code in existing_bill_codes:
-                print('skipping')
+                print('skipping bill, bill code already there')
                 continue
 
             #Since bill has already been added, get it to build relations
             bill = session.query(Bill).filter(Bill.bill_code == bill_code).first()
             if bill is None:
                 continue
-
 
             sponsor = data.get('sponsor', None)
             if not sponsor:
@@ -61,18 +67,16 @@ def add_sponsors(session, files, existing_bill_codes = []):
             
             #link and add to database
             if not pol:
-                print('missing')
+                print('Can\'t find politician for sponsorship')
                 continue
 
             primary_sponsor = Sponsorship(bill.id, pol.id, 'primary')
-            session.add(primary_sponsor)
+            sponsors_to_add.append(primary_sponsor)
+            cur_batch += 1
+            num_sponsors += 1
+
             bill.sponsors.append(primary_sponsor)
             pol.sponsorships.append(primary_sponsor)
-
-            #session.add(primary_sponsor)
-
-            num_bills += 1
-            num_sponsors += 1
 
             for cosp in data['cosponsors']:
                 
@@ -90,10 +94,19 @@ def add_sponsors(session, files, existing_bill_codes = []):
                 co_sponsor = Sponsorship(bill.id, pol.id, 'cosponsor')
                 bill.sponsors.append(co_sponsor)
                 pol.sponsorships.append(co_sponsor)
-                session.add(co_sponsor)
+                sponsors_to_add.append(co_sponsor)
 
                 num_sponsors += 1
+                cur_batch += 1
 
+                if cur_batch > 100000:
+                    session.bulk_save_objects(sponsors_to_add)
+                    session.commit()
+                    cur_batch = 0
+                    sponsors_to_add = []
+                #print(f"Adding sponsor #{num_sponsors}/{total_files}")
+
+    session.bulk_save_objects(sponsors_to_add)
     session.commit()
     print(f"{num_sponsors} Sponsors Added")
 

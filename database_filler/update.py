@@ -44,20 +44,20 @@ bs_paths = get_bill_state_paths()
 bill_paths = all_high_level_data_files()
 all_voting_dirs = get_all_vote_dirs()
 
-from parse_legislators import add_legislators
-add_legislators(session, existing_bioguides)
+# from parse_legislators import add_legislators
+# add_legislators(session, existing_bioguides)
 
-from parse_bills import add_bills_and_bill_states
-add_bills_and_bill_states(session, bs_paths, existing_bill_codes, existing_bill_state_identifiers)
+# from parse_bills import add_bills_and_bill_states
+# add_bills_and_bill_states(session, bs_paths, existing_bill_codes, existing_bill_state_identifiers)
 
-from parse_sponsor import add_sponsors
-add_sponsors(session, bill_paths, existing_bill_codes)
+# from parse_sponsor import add_sponsors
+# add_sponsors(session, bill_paths, existing_bill_codes)
 
-from parse_bill_ref import add_bill_refs
-add_bill_refs(session, bill_paths, existing_bill_codes)
+# from parse_bill_ref import add_bill_refs
+# add_bill_refs(session, bill_paths, existing_bill_codes)
 
-from parse_topics import add_topics
-add_topics(session, bill_paths, existing_bill_codes, existing_topics)
+# from parse_topics import add_topics
+# add_topics(session, bill_paths, existing_bill_codes, existing_topics)
 
 from parse_votes import add_votes
 add_votes(session, all_voting_dirs, existing_vote_info)

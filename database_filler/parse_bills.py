@@ -78,7 +78,7 @@ def add_bills_and_bill_states(session, files, existing_bill_codes = [], existing
                 new_bill_state = Bill_State(*bill_state_info)
                 cur_bill.bill_states.append(new_bill_state)
                 num_bill_states += 1
-                #print(f'added bill state {num_bill_states}')
+                print(f'added bill state {num_bill_states}')
             else:
                 print(f"bill_state json {relative_congress_loc + f[5] + '/data.json'} not found")
                 continue
@@ -86,8 +86,6 @@ def add_bills_and_bill_states(session, files, existing_bill_codes = [], existing
             print(f'bill json {bill_data_path} not found')
             continue
 
-        session.commit()
-
-
+    session.commit()
     print(f"{num_bills} Bill Added")
     print(f"{num_bill_states} Bill States Added")

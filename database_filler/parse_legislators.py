@@ -27,7 +27,7 @@ def add_legislators(session, existing_bioguides = []):
                 thomas_id = item['id'].get('thomas', None)
                 
                 if bioid in existing_bioguides:
-                    print('skipping adding politician')
+                    #print('skipping adding politician')
                     #skip over bioguide if it doesn't exist
                     continue
 
@@ -44,9 +44,6 @@ def add_legislators(session, existing_bioguides = []):
 
                 new_pol = Politician(bioid, thomas_id, dob, first_name, last_name, lis)
                 pols_added += 1
-
-
-                #pol_id = session.query(Politician.id).filter(Politician.bioid == bioid).first()[0]
 
                 #Adding Politician Terms
                 for term in item['terms']:
@@ -84,7 +81,6 @@ def add_legislators(session, existing_bioguides = []):
 
                 session.add(new_pol)
                 print(f'adding pol and terms! {pols_added}')
-
 
     session.commit()
     print(f"{pols_added} Politician added")

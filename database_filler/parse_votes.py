@@ -12,10 +12,11 @@ def add_votes(session, all_voting_dirs, existing_vote_info):
     date_format = "%Y-%m-%dT%H:%M:%S"
     num_votes, num_pol_votes = 0, 0
     i, skips, total_len = 0, 0, len(all_voting_dirs)
+    new_votes = []
     for vote_dir in all_voting_dirs:
         
         i += 1
-        #print(f"{i}/{total_len}")
+        print(f"Votes: {i}/{total_len}")
         with open(vote_dir + "/data.json") as f:
             data = json.load(f)
             if "bill" in data:
@@ -25,7 +26,7 @@ def add_votes(session, all_voting_dirs, existing_vote_info):
                 vote_date = datetime.strptime(data['date'][:-6], date_format).date()
                 
                 if [bill_code, vote_date] in existing_vote_info:
-                    print('skipping')
+                    print('skipping vote add, already there')
                     continue
 
                 bill = session.query(Bill).filter(Bill.bill_code == bill_code).first()
@@ -42,32 +43,32 @@ def add_votes(session, all_voting_dirs, existing_vote_info):
                 for vote_type in data["votes"]:
                     if vote_type in answer_dict:
                         for pol_vote in data["votes"][vote_type]:
-                            #try:
-                            num_pol_votes += 1
+                            try:
+                                num_pol_votes += 1
 
-                            politician = session.query(Politician).filter(Politician.bioid == pol_vote["id"]).first()
-                            if not politician:
-                                politician = session.query(Politician).filter(Politician.lis == pol_vote['id']).first()
+                                politician = session.query(Politician).filter(Politician.bioid == pol_vote["id"]).first()
                                 if not politician:
-                                    print('failed to get polid from bioid or lis')
-                                    continue
-                            
-                            vote_pol = Vote_Politician(new_vote.id,answer_dict[vote_type], politician.id)
-                            vote_pol.politician = politician
+                                    politician = session.query(Politician).filter(Politician.lis == pol_vote['id']).first()
+                                    if not politician:
+                                        print('failed to get polid from bioid or lis')
+                                        continue
+                                
+                                vote_pol = Vote_Politician(new_vote.id,answer_dict[vote_type], politician.id)
+                                vote_pol.politician = politician
 
-                            new_vote.vote_politicians.append(vote_pol)
-                            #print("Added vote pol!")
-                            #except:
-                            #    print('unknown pol_vote type, should be dict:')
-                            #    print(pol_vote)
+                                new_vote.vote_politicians.append(vote_pol)
+                                new_votes.append(new_vote)
+                                #print("Added vote pol!")
+                            except:
+                                print('unknown pol_vote type, should be dict:')
+                                print(pol_vote)
                     else:
                         print(f"Not supported vote type: {vote_type}")
                 
-                session.add(new_vote)
             else:
                 #print('no bill id in vote data')
                 continue
-
+    session.bulk_save_objects(new_votes)
     print(f'{num_votes} Votes Added')
     print(f'{num_pol_votes} Politician Votes Added')
     session.commit()
